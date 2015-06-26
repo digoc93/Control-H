@@ -1,7 +1,8 @@
+var server;
 var express = require('express');
 var bodyParser = require('body-parser');
 var methodOverride = require('method-override');
-var server;
+var oauthServer = require('oauth2-server');
 
 function expressServer () {
 	server = express();
@@ -16,9 +17,27 @@ function expressServer () {
 	});
 };
 
+expressServer.prototype.oauthConfig = function(model) {
+	server.oauth = oauthServer({
+	  model: require('./models/oauthModels/models.js'),
+	  grants: ['authorization_code'],
+	  debug: true
+	});
+
+	server.all('/oauth/token', server.oauth.grant());
+
+	server.get('/', server.oauth.authorise(), function (req, res) {
+	  res.send('Secret area');
+	});
+
+
+	server.use(server.oauth.errorHandler());
+
+};
+
 expressServer.prototype.useRouter = function(url, router) {
 	server.use(url, router);
-	console.log('add use');
+	console.log('add use' + url);
 };
 
 expressServer.prototype.getServerExpress= function(){

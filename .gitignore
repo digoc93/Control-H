@@ -1,0 +1,10 @@
+node_modules/body-parser
+node_modules/multer-autoreap
+node_modules/multer
+node_modules/express
+node_modules/mongoose
+node_modules/serve-favicon
+node_modules/async
+node_modules/method-override
+node_modules/mongoose-auto-increment
+node_modules/oauth2-server

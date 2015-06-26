@@ -7,8 +7,8 @@ var mongoose = require("mongoose");
 var methods = require('./methods.js');
 var ExpressServer = require('./ExpressServer.js');
 
-var key = fs.readFileSync('./controlH-key.pem');
-var cert = fs.readFileSync('./controlH-cert.pem')
+var key = fs.readFileSync('./Certificate/controlH-key.pem');
+var cert = fs.readFileSync('./Certificate/controlH-cert.pem')
 
 var https_options = {
     key: key,
@@ -27,9 +27,3 @@ expressServer = new ExpressServer();
 expressServer.useRouter('/horario',methods);
 server = https.createServer(https_options, expressServer.getServerExpress()).listen(PORT, HOST);
 console.log('HTTPS Server listening on %s:%s', HOST, PORT);
-
-/*
-server.listen(3000, function(){
-	console.log("Node server running on http://localhost:3000");
-});
-*/
