@@ -37,7 +37,7 @@ router.post('/user', function (req, res) {
 
 router.post('/login', function (req, res) {
 	if(req.body.name && req.body.pass){
-		controlh.signIn(req.body.name, req.body.pass, inOffice, function(err,usuario){
+		controlh.signIn(req.body.name, req.body.pass, inOffice(), function(err,usuario){
 			if(err){
 				res.status(200).jsonp({error : err});
 			}
@@ -59,7 +59,7 @@ router.post('/login', function (req, res) {
 
 router.post('/logout', function (req, res) {
 	if(req.body.name && req.body.pass){
-		controlh.signOut(req.body.name, req.body.pass, inOffice, req.body.labored, function(err,usuario){
+		controlh.signOut(req.body.name, req.body.pass, inOffice(), req.body.labored, function(err,usuario){
 			if(err)
 			{
 				res.status(200).jsonp({error : err});
