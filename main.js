@@ -6,7 +6,7 @@ var mongoose = require("mongoose");
 var methods = require('./methods.js');
 var ExpressServer = require('./ExpressServer.js');
 
-var PORT = 3000;
+var PORT = 3003;
 var HOST = 'localhost';
 
 mongoose.connect("mongodb://localhost/ControlH3", function(err, res){
