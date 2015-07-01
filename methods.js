@@ -95,8 +95,9 @@ router.get('/workingNow',function (req, res) {
 });
 
 var inOffice =function(){
-	var office = false; 	
-	if(getClientIp == "181.142.202.23"){
+	var office = false;
+	console.log(getClientIp()); 	
+	if(getClientIp() == "181.142.202.23"){
 		office = true;
 	}
 	return office;
