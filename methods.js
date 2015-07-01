@@ -1,4 +1,4 @@
-var controlh = require("controlh3");
+var controlh = require("ControlH3");
 var express = require('express');
 var router = express.Router();
 
