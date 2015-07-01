@@ -1,7 +1,7 @@
 var server;
 var expressServer;
 
-var https = require('http');
+var http = require('http');
 var mongoose = require("mongoose");
 var methods = require('./methods.js');
 var ExpressServer = require('./ExpressServer.js');
@@ -15,7 +15,7 @@ mongoose.connect("mongodb://localhost/ControlH3", function(err, res){
 });
 
 expressServer = new ExpressServer(); 
-expressServer.oauthConfig();
+//expressServer.oauthConfig();
 expressServer.useRouter('/horario',methods);
-server = https.createServer(expressServer.getServerExpress()).listen(PORT, HOST);
+server = http.createServer(expressServer.getServerExpress()).listen(PORT);
 console.log('HTTP Server listening on %s:%s', HOST, PORT);

@@ -2,6 +2,16 @@ var controlh = require("ControlH3");
 var express = require('express');
 var router = express.Router();
 
+var office = false;
+
+router.use(function (req, res, next) {
+	console.log("-----" + getClientIp(req));
+	if(req.connection.remoteAdderess == ""){
+
+	}
+	next();
+});
+
 router.get('/test1', function (req, res, next) {
  	var hora;
  	var a;
@@ -95,6 +105,20 @@ router.get('/workingNow',function (req, res) {
 		}
 	});
 });
+
+var getClientIp = function(req) {
+  var ipAddress = null;
+  var forwardedIpsStr = req.headers['x-forwarded-for'];
+  if (forwardedIpsStr) {
+    ipAddress = forwardedIpsStr[0];
+    console.log(1);
+  }
+  if (!ipAddress) {
+  	console.log(2);
+    ipAddress = req.connection.remoteAddress;
+  }
+  return ipAddress;
+};
 
 module.exports = router;
 module.exports
