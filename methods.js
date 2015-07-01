@@ -37,7 +37,7 @@ router.post('/user', function (req, res) {
 
 router.post('/login', function (req, res) {
 	if(req.body.name && req.body.pass){
-		controlh.signIn(req.body.name, req.body.pass, inOffice(), function(err,usuario){
+		controlh.signIn(req.body.name, req.body.pass, inOffice(req), function(err,usuario){
 			if(err){
 				res.status(200).jsonp({error : err});
 			}
@@ -59,7 +59,7 @@ router.post('/login', function (req, res) {
 
 router.post('/logout', function (req, res) {
 	if(req.body.name && req.body.pass){
-		controlh.signOut(req.body.name, req.body.pass, inOffice(), req.body.labored, function(err,usuario){
+		controlh.signOut(req.body.name, req.body.pass, inOffice(req), req.body.labored, function(err,usuario){
 			if(err)
 			{
 				res.status(200).jsonp({error : err});
@@ -94,10 +94,10 @@ router.get('/workingNow',function (req, res) {
 	});
 });
 
-var inOffice =function(){
+var inOffice =function(req){
 	var office = false;
-	console.log(getClientIp()); 	
-	if(getClientIp() == "181.142.202.23"){
+	console.log(getClientIp(req)); 	
+	if(getClientIp(req) == "181.142.202.23"){
 		office = true;
 	}
 	return office;
