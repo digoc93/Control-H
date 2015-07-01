@@ -2,16 +2,6 @@ var controlh = require("ControlH3");
 var express = require('express');
 var router = express.Router();
 
-var office = false;
-
-router.use(function (req, res, next) {
-	console.log("-----" + getClientIp(req));
-	if(req.connection.remoteAdderess == ""){
-
-	}
-	next();
-});
-
 router.get('/test1', function (req, res, next) {
  	var hora;
  	var a;
@@ -45,11 +35,9 @@ router.post('/user', function (req, res) {
 	});
 });
 
-
-
 router.post('/login', function (req, res) {
 	if(req.body.name && req.body.pass){
-		controlh.signIn(req.body.name, req.body.pass, null, function(err,usuario){
+		controlh.signIn(req.body.name, req.body.pass, inOffice, function(err,usuario){
 			if(err){
 				res.status(200).jsonp({error : err});
 			}
@@ -71,7 +59,7 @@ router.post('/login', function (req, res) {
 
 router.post('/logout', function (req, res) {
 	if(req.body.name && req.body.pass){
-		controlh.signOut(req.body.name, req.body.pass, null, req.body.labored, function(err,usuario){
+		controlh.signOut(req.body.name, req.body.pass, inOffice, req.body.labored, function(err,usuario){
 			if(err)
 			{
 				res.status(200).jsonp({error : err});
@@ -106,6 +94,14 @@ router.get('/workingNow',function (req, res) {
 	});
 });
 
+var inOffice =function(){
+	var office = false; 	
+	if(getClientIp == "181.142.202.23"){
+		office = true;
+	}
+	return office;
+}
+
 var getClientIp = function(req) {
   var ipAddress = null;
   var forwardedIpsStr = req.headers['x-forwarded-for'];
@@ -121,4 +117,3 @@ var getClientIp = function(req) {
 };
 
 module.exports = router;
-module.exports
