@@ -14,8 +14,7 @@ router.get('/test1', function (req, res, next) {
 		b = new Date("February 12, 2014 03:00:00");
 		//La diferencia se da en milisegundos así que debes dividir entre 1000
 		var c = ((a-b)/3600000);
-	  console.log(result.timestamp + 1000 *3600);
-		
+	  	console.log(result.timestamp + 1000 *3600);		
 		res.send('Hora fecha	: ' + fecha);
  	});
 
@@ -24,7 +23,7 @@ router.get('/test1', function (req, res, next) {
 router.post('/user', function (req, res) {
 	var user = {
 		name : req.body.name,
-		password :req.body.pass
+		password :req.body.password
 	};
 
 	controlh.signUp(user, function(err, usuario){
@@ -36,8 +35,8 @@ router.post('/user', function (req, res) {
 });
 
 router.post('/login', function (req, res) {
-	if(req.body.name && req.body.pass){
-		controlh.signIn(req.body.name, req.body.pass, inOffice(req), function(err,usuario){
+	if(req.body.name && req.body.password){
+		controlh.signIn(req.body.name, req.body.password, inOffice(req), function(err,usuario){
 			if(err){
 				res.status(200).jsonp({error : err});
 			}
@@ -58,8 +57,8 @@ router.post('/login', function (req, res) {
 });
 
 router.post('/logout', function (req, res) {
-	if(req.body.name && req.body.pass){
-		controlh.signOut(req.body.name, req.body.pass, inOffice(req), req.body.labored, function(err,usuario){
+	if(req.body.name && req.body.password){
+		controlh.signOut(req.body.name, req.body.password, inOffice(req), req.body.labored, function(err,usuario){
 			if(err)
 			{
 				res.status(200).jsonp({error : err});
@@ -92,6 +91,25 @@ router.get('/workingNow',function (req, res) {
 			res.status(200).jsonp(usersResult);
 		}
 	});
+});
+
+router.post('/passwordChange',function(req,res){
+	if(req.body.name && req.body.password req.body.newPassword){
+		var user = {
+		name : req.body.name,
+		password:req.body.password,
+		newPassword: req.body.newPassword
+		};
+		controlh.passwordChange(user,function(err,usuario){
+			if(err){
+				res.status(200).jsonp({error : err});
+			}else{			
+				res.status(200).jsonp({mensaje : "Contraseña cambiada satisfactoriamente"});				
+			}
+		});
+	}else{
+		res.status(200).jsonp({error: "Los datos nos estan completos"});
+	}
 });
 
 var inOffice =function(req){
