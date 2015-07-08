@@ -96,5 +96,36 @@ router.get('/workingNow',function (req, res) {
 	});
 });
 
+router.post('/Agendas',function(req,rest){	
+	if(Object.keys(req.body).length==8){
+		var user= req.body.idUser;
+		var agendaSubmit={
+			idUser: req.body.idUser,
+			lunes: req.body.lunes,
+			martes: req.body.martes,
+			miercoles: req.body.miercoles,
+			jueves: req.body.jueves,
+			viernes: req.body.viernes,
+			sabado: req.body.sabado,
+			domingo: req.body.domingo
+		};
+		controlh.CrearAgenda(user,agendaSubmit,function(err,agenda){
+			if(err)
+				res.status(500);
+			else{				
+				res.status(200).jsonp(agenda);
+			}	
+		});
+	}else{
+		res.status(200).jsonp({error: "El formulario esta incompelto"});
+	}
+});
+
+router.get('/Agendas',function(req,rest){
+	if(req.body.idUser){
+		controlh.
+	}
+});
+
 module.exports = router;
 module.exports
