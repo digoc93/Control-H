@@ -53,8 +53,7 @@ router.post('/login', function (req, res) {
 			}
 		});
 	}
-	else
-	{
+	else{
 		res.status(200).jsonp({error: "Ingrese nombre y password"});
 	}
 });
@@ -96,7 +95,7 @@ router.get('/workingNow',function (req, res) {
 	});
 });
 
-router.post('/Agendas',function(req,rest){	
+router.post('/newSchedule',function(req,res){		
 	if(Object.keys(req.body).length==8){
 		var user= req.body.idUser;
 		var agendaSubmit={
@@ -108,24 +107,39 @@ router.post('/Agendas',function(req,rest){
 			viernes: req.body.viernes,
 			sabado: req.body.sabado,
 			domingo: req.body.domingo
-		};
-		controlh.CrearAgenda(user,agendaSubmit,function(err,agenda){
+		};		
+		controlh.addSchedule(user,agendaSubmit,function(err,agenda){
 			if(err)
-				res.status(500);
+				res.status(500).jsonp({error : err});
 			else{				
 				res.status(200).jsonp(agenda);
 			}	
 		});
 	}else{
-		res.status(200).jsonp({error: "El formulario esta incompelto"});
+		res.status(200).jsonp({error: "El formulario esta incompleto"});
 	}
 });
 
-router.get('/Agendas',function(req,rest){
+router.get('/mySchedules',function(req,res){
 	if(req.body.idUser){
-		controlh.
+		controlh.getSchedulesByUser(req.body.user,function(err,agendas){
+			if(err){
+				res.status(500).jsonp({error:err});
+			}else{
+				res.status(200).jsonp(agendas);
+			}
+		});
 	}
+});
+
+router.get('allSchedules',function(req,res){
+	controlh.getAllSchedules(function(err,agendas){
+		if(err){
+			res.status(500).jsonp({error:err});
+		}else{
+			res.status(200).jsonp(agendas);
+		}
+	});
 });
 
 module.exports = router;
-module.exports
