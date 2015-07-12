@@ -50,8 +50,7 @@ router.post('/login', function (req, res) {
 			}
 		});
 	}
-	else
-	{
+	else{
 		res.status(200).jsonp({error: "Ingrese nombre y password"});
 	}
 });
@@ -110,6 +109,53 @@ router.post('/passwordChange',function(req,res){
 	}else{
 		res.status(200).jsonp({error: "Los datos nos estan completos"});
 	}
+});
+
+router.post('/newSchedule',function(req,res){		
+	if(Object.keys(req.body).length==8){
+		var user= req.body.idUser;
+		var agendaSubmit={
+			idUser: req.body.idUser,
+			lunes: req.body.lunes,
+			martes: req.body.martes,
+			miercoles: req.body.miercoles,
+			jueves: req.body.jueves,
+			viernes: req.body.viernes,
+			sabado: req.body.sabado,
+			domingo: req.body.domingo
+		};		
+		controlh.addSchedule(user,agendaSubmit,function(err,agenda){
+			if(err)
+				res.status(500).jsonp({error : err});
+			else{				
+				res.status(200).jsonp(agenda);
+			}	
+		});
+	}else{
+		res.status(200).jsonp({error: "El formulario esta incompleto"});
+	}
+});
+
+router.get('/mySchedules',function(req,res){
+	if(req.body.idUser){
+		controlh.getSchedulesByUser(req.body.user,function(err,agendas){
+			if(err){
+				res.status(500).jsonp({error:err});
+			}else{
+				res.status(200).jsonp(agendas);
+			}
+		});
+	}
+});
+
+router.get('allSchedules',function(req,res){
+	controlh.getAllSchedules(function(err,agendas){
+		if(err){
+			res.status(500).jsonp({error:err});
+		}else{
+			res.status(200).jsonp(agendas);
+		}
+	});
 });
 
 var inOffice =function(req){
