@@ -93,7 +93,7 @@ router.get('/workingNow',function (req, res) {
 });
 
 router.post('/passwordChange',function(req,res){
-	if(req.body.name && req.body.password req.body.newPassword){
+	if(req.body.name && req.body.password && req.body.newPassword){
 		var user = {
 		name : req.body.name,
 		password:req.body.password,
@@ -180,5 +180,36 @@ var getClientIp = function(req) {
   }
   return ipAddress;
 };
+
+router.get('/horas/:idUser/:year/:month/:day', function (req, res) {
+	var info = {
+		idUser  : parseInt(req.param("idUser")),
+		year  : parseInt(req.param("year")),
+		month  : parseInt(req.param("month")),
+		day  : parseInt(req.param("day"))
+	}
+	controlh.getTotalHours(info, function(err, result){
+		if(err){
+			res.status(500).jsonp({error:err});
+		}else{
+			res.status(200).jsonp(result);
+		}
+	});
+});
+
+router.get('/horas/:idUser/:year/:month', function (req, res) {
+	var info = {
+		idUser  : parseInt(req.param("idUser")),
+		year  : parseInt(req.param("year")),
+		month  : parseInt(req.param("month")),
+	}
+	controlh.getTotalHours(info, function(err, result){
+		if(err){
+			res.status(500).jsonp({error:err});
+		}else{
+			res.status(200).jsonp(result);
+		}
+	});
+});
 
 module.exports = router;
