@@ -4,12 +4,13 @@ var expressServer;
 var http = require('http');
 var mongoose = require("mongoose");
 var methods = require('./methods.js');
+var config = require('./config/config.json');
 var ExpressServer = require('./ExpressServer.js');
 
-var PORT = 3003;
-var HOST = 'localhost';
+var port = config.port;
+var host = config.host;
 
-mongoose.connect("mongodb://localhost/ControlH3", function(err, res){
+mongoose.connect("mongodb://" + config.host + "/" + config.namedb, function(err, res){
 	if(err) throw err;
 	console.log("Connected to database"); 
 });
@@ -17,5 +18,5 @@ mongoose.connect("mongodb://localhost/ControlH3", function(err, res){
 expressServer = new ExpressServer(); 
 //expressServer.oauthConfig();
 expressServer.useRouter('/horario',methods);
-server = http.createServer(expressServer.getServerExpress()).listen(PORT);
-console.log('HTTP Server listening on %s:%s', HOST, PORT);
+server = http.createServer(expressServer.getServerExpress()).listen(port);
+console.log('HTTP Server listening on %s:%s', host, port);
