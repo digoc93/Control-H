@@ -1,6 +1,7 @@
 var controlh = require("ControlH3");
 var express = require('express');
 var router = express.Router();
+var ipOffice = require("./config/config.json").ipOffice;
 
 router.get('/test1', function (req, res, next) {
  	var hora;
@@ -162,10 +163,13 @@ router.get('allSchedules',function(req,res){
 
 var inOffice =function(req){
 	var office = false;
-	console.log(getClientIp(req)); 	
-	if(getClientIp(req) == "181.142.202.23"){
-		office = true;
-	}
+	var ipClient = getClientIp(req);
+	for (var i = 0; i < ipOffice.length; i++) {
+		if(ipClient == 	ipOffice[i].ip){
+			office = true;
+			i = ipOffice.length; 
+		}
+	};	
 	return office;
 }
 
@@ -174,10 +178,8 @@ var getClientIp = function(req) {
   var forwardedIpsStr = req.headers['x-forwarded-for'];
   if (forwardedIpsStr) {
     ipAddress = forwardedIpsStr[0];
-    console.log(1);
   }
   if (!ipAddress) {
-  	console.log(2);
     ipAddress = req.connection.remoteAddress;
   }
   return ipAddress;

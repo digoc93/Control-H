@@ -1,0 +1,8 @@
+{
+	"port" : 3003,
+	"host" : "localhost",
+	"namedb" : "ControlH3", 
+	"ipOffice" : [
+		{"ip":"200.116.52.128"}
+	]
+}
