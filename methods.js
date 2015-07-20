@@ -38,7 +38,7 @@ router.post('/login', function (req, res) {
 	if(req.body.name && req.body.password){
 		controlh.signIn(req.body.name, req.body.password, inOffice(req), function(err,usuario){
 			if(err){
-				res.status(200).jsonp({error : err});
+				res.status(500).jsonp({error : err});
 			}
 			else{
 				var user = {
@@ -51,7 +51,7 @@ router.post('/login', function (req, res) {
 		});
 	}
 	else{
-		res.status(200).jsonp({error: "Ingrese nombre y password"});
+		res.status(500).jsonp({error: "Ingrese nombre y password"});
 	}
 });
 
@@ -60,7 +60,7 @@ router.post('/logout', function (req, res) {
 		controlh.signOut(req.body.name, req.body.password, inOffice(req), req.body.labored, function(err,usuario){
 			if(err)
 			{
-				res.status(200).jsonp({error : err});
+				res.status(500).jsonp({error : err});
 			}
 			else{
 				var user = {
@@ -95,19 +95,21 @@ router.get('/workingNow',function (req, res) {
 router.post('/passwordChange',function(req,res){
 	if(req.body.name && req.body.password && req.body.newPassword){
 		var user = {
-		name : req.body.name,
-		password:req.body.password,
-		newPassword: req.body.newPassword
+			name : req.body.name,
+			password:req.body.password,
+			newPassword: req.body.newPassword
 		};
-		controlh.passwordChange(user,function(err,usuario){
+		controlh.passwordChange(user,function(err,usuario){	
+			console.log("Error: "+ err);
+			console.log("Contenido: "+ usuario);
 			if(err){
-				res.status(200).jsonp({error : err});
-			}else{			
-				res.status(200).jsonp({mensaje : "Contraseña cambiada satisfactoriamente"});				
+				res.status(500).jsonp({error : err});
+			}else{				
+				res.status(200).jsonp(usuario);
 			}
 		});
 	}else{
-		res.status(200).jsonp({error: "Los datos nos estan completos"});
+		res.status(500).jsonp({error: "Los datos no estan completos"});
 	}
 });
 
@@ -132,7 +134,7 @@ router.post('/newSchedule',function(req,res){
 			}	
 		});
 	}else{
-		res.status(200).jsonp({error: "El formulario esta incompleto"});
+		res.status(500).jsonp({error: "El formulario esta incompleto"});
 	}
 });
 
