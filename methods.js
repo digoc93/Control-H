@@ -216,4 +216,19 @@ router.get('/horas/:idUser/:year/:month', function (req, res) {
 	});
 });
 
+router.get('/rango/:idUser/:fechaInicial/:fechaFinal', function (req, res) {
+	var info = {
+		idUser : req.param('idUser'),
+		initDate: req.param('fechaInicial'),
+		finalDate: req.param('fechaFinal')
+	}
+	controlh.getHoursInDateRange(info, function(err, result){
+		if(err){
+			res.status(500).jsonp({error:err});
+		}else{
+			res.status(200).jsonp(result);
+		}
+	});
+});
+
 module.exports = router;
