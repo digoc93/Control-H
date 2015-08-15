@@ -36,15 +36,15 @@ router.post('/user', function (req, res) {
 });
 
 router.post('/login', function (req, res) {
-	if(req.body.name && req.body.password){
-		controlh.signIn(req.body.name, req.body.password, inOffice(req), function(err,usuario){
+	if(req.body.name && req.body.password && req.body.date){
+		controlh.signIn(req.body.name, req.body.password, new Date(req.body.date), inOffice(req), function(err,usuario){
 			if(err){
 				res.status(500).jsonp({error : err});
 			}
 			else{
 				var user = {
 					name : req.body.name,
-					date : new Date(usuario.input),
+					date : req.body.date,
 					type : usuario.type
 				};
 				res.status(200).jsonp(user);
@@ -57,8 +57,8 @@ router.post('/login', function (req, res) {
 });
 
 router.post('/logout', function (req, res) {
-	if(req.body.name && req.body.password){
-		controlh.signOut(req.body.name, req.body.password, inOffice(req), req.body.labored, function(err,usuario){
+	if(req.body.name && req.body.password && req.body.date){
+		controlh.signOut(req.body.name, req.body.password, new Date(req.body.date), inOffice(req), req.body.labored, function(err,usuario){
 			if(err)
 			{
 				res.status(500).jsonp({error : err});
@@ -66,7 +66,7 @@ router.post('/logout', function (req, res) {
 			else{
 				var user = {
 					name : req.body.name,
-					date : new Date(usuario.input),
+					date : req.body.date,
 					type : usuario.type
 				};
 				res.status(200).jsonp(user);
