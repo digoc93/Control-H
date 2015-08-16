@@ -52,7 +52,7 @@ router.post('/login', function (req, res) {
 		});
 	}
 	else{
-		res.status(500).jsonp({error: "Ingrese nombre y password"});
+		res.status(500).jsonp({error: "Enter username and password"});
 	}
 });
 
@@ -100,9 +100,7 @@ router.post('/passwordChange',function(req,res){
 			password:req.body.password,
 			newPassword: req.body.newPassword
 		};
-		controlh.passwordChange(user,function(err,usuario){	
-			console.log("Error: "+ err);
-			console.log("Contenido: "+ usuario);
+		controlh.passwordChange(user,function(err,usuario){				
 			if(err){
 				res.status(500).jsonp({error : err});
 			}else{				
@@ -110,24 +108,17 @@ router.post('/passwordChange',function(req,res){
 			}
 		});
 	}else{
-		res.status(500).jsonp({error: "Los datos no estan completos"});
+		res.status(500).jsonp({error: "The data are not complete"});
 	}
 });
 
-router.post('/newSchedule',function(req,res){		
-	if(Object.keys(req.body).length==8){
-		var user= req.body.idUser;
+router.post('/newSchedule',function(req,res){
+	if(Object.keys(req.body).length==2){		
 		var agendaSubmit={
 			idUser: req.body.idUser,
-			lunes: req.body.lunes,
-			martes: req.body.martes,
-			miercoles: req.body.miercoles,
-			jueves: req.body.jueves,
-			viernes: req.body.viernes,
-			sabado: req.body.sabado,
-			domingo: req.body.domingo
+			day: req.body.day
 		};		
-		controlh.addSchedule(user,agendaSubmit,function(err,agenda){
+		controlh.addSchedule(agendaSubmit,function(err,agenda){
 			if(err)
 				res.status(500).jsonp({error : err});
 			else{				
@@ -135,23 +126,22 @@ router.post('/newSchedule',function(req,res){
 			}	
 		});
 	}else{
-		res.status(500).jsonp({error: "El formulario esta incompleto"});
+		res.status(500).jsonp({error: "The form is incomplete"});
 	}
 });
 
-router.get('/mySchedules',function(req,res){
-	if(req.body.idUser){
-		controlh.getSchedulesByUser(req.body.user,function(err,agendas){
-			if(err){
-				res.status(500).jsonp({error:err});
-			}else{
-				res.status(200).jsonp(agendas);
-			}
-		});
-	}
+router.get('/mySchedules/:idUser',function(req,res){
+	controlh.getSchedulesByUser(parseInt(req.param("idUser")),function(err,agendas){
+		if(err){	
+			res.status(500).jsonp({error:err});
+		}else{
+			res.status(200).jsonp(agendas);
+		}
+	});
+	
 });
 
-router.get('allSchedules',function(req,res){
+router.get('/allSchedules',function(req,res){
 	controlh.getAllSchedules(function(err,agendas){
 		if(err){
 			res.status(500).jsonp({error:err});
