@@ -223,14 +223,14 @@ router.get('/rango/:idUser/:fechaInicial/:fechaFinal', function (req, res) {
 
 router.post('/projects', function(req, res){
 	if(Object.keys(req.body).length == 5){
-		controlh.addProject(req.body,function(errror,response){
+		controlh.addProject(req.body,function(error,response){
 			if(error){
 				res.status(500).jsonp({error:error});
 			}else{
-				res.status(200).jsonp(result);
+				res.status(200).jsonp(response);
 			}
 		});	
-	}}else{
+	}else{
 		res.status(500).jsonp({error: "The form is incomplete"});
 	}	
 });
