@@ -112,7 +112,7 @@ router.post('/passwordChange',function(req,res){
 	}
 });
 
-router.post('/newSchedule',function(req,res){
+router.post('/schedules',function(req,res){
 	if(Object.keys(req.body).length==2){		
 		var agendaSubmit={
 			idUser: req.body.idUser,
@@ -130,7 +130,7 @@ router.post('/newSchedule',function(req,res){
 	}
 });
 
-router.get('/mySchedules/:idUser',function(req,res){
+router.get('/schedules/:idUser',function(req,res){
 	controlh.getSchedulesByUser(parseInt(req.param("idUser")),function(err,agendas){
 		if(err){	
 			res.status(500).jsonp({error:err});
@@ -141,7 +141,7 @@ router.get('/mySchedules/:idUser',function(req,res){
 	
 });
 
-router.get('/allSchedules',function(req,res){
+router.get('/schedules',function(req,res){
 	controlh.getAllSchedules(function(err,agendas){
 		if(err){
 			res.status(500).jsonp({error:err});
@@ -217,6 +217,40 @@ router.get('/rango/:idUser/:fechaInicial/:fechaFinal', function (req, res) {
 			res.status(500).jsonp({error:err});
 		}else{
 			res.status(200).jsonp(result);
+		}
+	});
+});
+
+router.post('/projects', function(req, res){
+	if(Object.keys(req.body).length == 5){
+		controlh.addProject(req.body,function(errror,response){
+			if(error){
+				res.status(500).jsonp({error:error});
+			}else{
+				res.status(200).jsonp(result);
+			}
+		});	
+	}}else{
+		res.status(500).jsonp({error: "The form is incomplete"});
+	}	
+});
+
+router.get('/projects', function(req,res){
+	controlh.getAllProjects(function(err,response){
+		if(err){
+			res.status(500).jsonp({error:err});
+		}else{
+			res.status(200).jsonp(response);
+		}
+	});
+});
+
+router.get('/projects/:idProject', function(req,res){
+	controlh.getProjectById(parseInt(req.param("idProject")),function(err,response){
+		if(err){
+			res.status(500).jsonp({error:err});
+		}else{
+			res.status(200).jsonp(response);
 		}
 	});
 });
