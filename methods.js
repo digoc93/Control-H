@@ -151,6 +151,20 @@ router.get('/schedules',function(req,res){
 	});
 });
 
+router.patch('/schedules/:idSchedule',function(req,res){
+	if(Object.keys(req.body).length>0){
+		controlh.patchScheduleById(parseInt(req.param("idSchedule")), req.body.day, function(error,response){
+			if(error){
+				res.status(500).jsonp({error:error});
+			}else{
+				res.status(200).jsonp(response);
+			}
+		});
+	}else{
+		res.status(500).jsonp({error: "The are not data to update the register"});
+	}
+});
+
 var inOffice =function(req){
 	var office = false;
 	var ipClient = getClientIp(req);
@@ -253,6 +267,20 @@ router.get('/projects/:idProject', function(req,res){
 			res.status(200).jsonp(response);
 		}
 	});
+});
+
+router.patch('/projects/:idProject',function(req,res){
+	if(Object.keys(req.body).length>0){
+		controlh.patchProjectById(parseInt(req.param("idProject")),req.body, function(error,response){
+			if(error){
+				res.status(500).jsonp({error:error});
+			}else{
+				res.status(200).jsonp(response);
+			}
+	});
+	}else{
+		res.status(500).jsonp({error: "The are not data to update the register"});
+	}
 });
 
 module.exports = router;
