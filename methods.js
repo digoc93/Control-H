@@ -21,6 +21,8 @@ router.get('/test1', function (req, res, next) {
 
 });
 
+/----------------------------------------------------- User managment and basic services  ------------------------------------------------/ 
+
 router.post('/user', function (req, res) {
 	var user = {
 		name : req.body.name,
@@ -112,6 +114,8 @@ router.post('/passwordChange',function(req,res){
 	}
 });
 
+/--------------------------------------- Schedule managment : (Post, Get by user, Get All, and Patch)  -----------------------------------/ 
+
 router.post('/schedules',function(req,res){
 	if(Object.keys(req.body).length==2){		
 		var agendaSubmit={
@@ -131,7 +135,7 @@ router.post('/schedules',function(req,res){
 });
 
 router.get('/schedules/:idUser',function(req,res){
-	controlh.getSchedulesByUser(parseInt(req.param("idUser")),function(err,agendas){
+	controlh.getSchedulesByIdUser(parseInt(req.param("idUser")),function(err,agendas){
 		if(err){	
 			res.status(500).jsonp({error:err});
 		}else{
@@ -165,6 +169,8 @@ router.patch('/schedules/:idSchedule',function(req,res){
 	}
 });
 
+/--------------------- IP status functions. Its function is to determine whether the usaurio this at home or in the office ---------------/ 
+
 var inOffice =function(req){
 	var office = false;
 	var ipClient = getClientIp(req);
@@ -188,6 +194,8 @@ var getClientIp = function(req) {
   }
   return ipAddress;
 };
+
+/------------------------------------------ Measurement ranges of hour work in different ways ---------------------------------------------/
 
 router.get('/horas/:idUser/:year/:month/:day', function (req, res) {
 	var info = {
@@ -234,6 +242,8 @@ router.get('/rango/:idUser/:fechaInicial/:fechaFinal', function (req, res) {
 		}
 	});
 });
+
+/------------------------------------------ Project managment : (Post, Get All , Get by id and Patch)  -----------------------------------/ 
 
 router.post('/projects', function(req, res){
 	if(Object.keys(req.body).length == 5){
