@@ -2,6 +2,7 @@ var controlh = require("ControlH3");
 var express = require('express');
 var router = express.Router();
 var ipOffice = require("./config/config.json").ipOffice;
+var differenceUTM = require("./config/config.json").differenceUTM;
 
 router.get('/test1', function (req, res, next) {
  	var hora;
@@ -31,9 +32,9 @@ router.post('/user', function (req, res) {
 
 	controlh.signUp(user, function(err, usuario){
 		if(err)
-			res.send(err);
+			res.status(500).jsonp({error: err});
 		else
-			res.send(usuario);
+			res.status(500)(usuario);
 	});
 });
 
@@ -232,7 +233,8 @@ router.get('/rango/:idUser/:fechaInicial/:fechaFinal', function (req, res) {
 	var info = {
 		idUser : req.param('idUser'),
 		initDate: req.param('fechaInicial'),
-		finalDate: req.param('fechaFinal')
+		finalDate: req.param('fechaFinal'),
+		diff : differenceUTM
 	}
 	controlh.getHoursInDateRange(info, function(err, result){
 		if(err){

@@ -3,6 +3,7 @@
 	"host" : "localhost",
 	"namedb" : "ControlH3", 
 	"ipOffice" : [
-		{"ip":"200.116.52.128"}
-	]
+		{"ip" : "200.116.52.128"}
+	],
+	"differenceUTM" : 300
 }
