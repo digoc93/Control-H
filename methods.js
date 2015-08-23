@@ -295,4 +295,32 @@ router.patch('/projects/:idProject',function(req,res){
 	}
 });
 
+/------------------------------------------ Backlog managment : (Post, Get All , Get by id and Patch)  -----------------------------------/ 
+router.post('/projects/:idProject/backlogs/:type', function(req, res){
+	if(req.param('type') == 'history'){
+		res.status(500).jsonp({error : "It can only be a history backlog for project"});
+	}else{
+		controlh.addBacklog(req.body,function(error,response){
+			if(error){
+				res.status(500).jsonp({error:error});
+			}else{
+				res.status(200).jsonp(response);
+			}
+		});			
+});
+
+router.get('/projects/:idProject/backlogs/:type', function(req, res){
+	if(req.param('idProject') && req.param('type')){
+		res.status(400).jsonp({error : "Malformed URL"});
+	}else{
+		controlh.getBacklogsByProjectIdAndType(parseInt(req.param('idProject')),req.param('type'), function(error, response){
+			if(error){
+				res.status(500).jsonp({error:error});
+			}else{
+				res.status(200).jsonp(response);
+			}
+		});
+	}
+});
+
 module.exports = router;
