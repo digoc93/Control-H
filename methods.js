@@ -300,26 +300,45 @@ router.post('/projects/:idProject/backlogs/:type', function(req, res){
 	if(req.param('type') == 'history'){
 		res.status(500).jsonp({error : "It can only be a history backlog for project"});
 	}else{
-		controlh.addBacklog(req.body,function(error,response){
-			if(error){
-				res.status(500).jsonp({error:error});
-			}else{
-				res.status(200).jsonp(response);
-			}
-		});			
-});
-
-router.get('/projects/:idProject/backlogs/:type', function(req, res){
-	if(req.param('idProject') && req.param('type')){
-		res.status(400).jsonp({error : "Malformed URL"});
-	}else{
-		controlh.getBacklogsByProjectIdAndType(parseInt(req.param('idProject')),req.param('type'), function(error, response){
+		controlh.addBacklog(req.param('idProject'), req.param('type'), req.body,function(error,response){
 			if(error){
 				res.status(500).jsonp({error:error});
 			}else{
 				res.status(200).jsonp(response);
 			}
 		});
+	}			
+});
+
+router.get('/projects/:idProject/backlogs/:type', function(req, res){
+	if(req.param('idProject') && req.param('type')){
+		controlh.getBacklogsByProjectIdAndType(parseInt(req.param('idProject')),req.param('type'), function(error, response){
+			if(error){
+				res.status(500).jsonp({error:error});
+			}else{
+				res.status(200).jsonp(response);
+			}
+		});		
+	}else{
+		res.status(400).jsonp({error : "Malformed URL"});
+	}
+});
+
+router.patch('/projects/:idProject/backlogs/:type/:id', function(req,res){
+	if(req.param('idProject') && req.param('type') && req.param('id')){
+		if(Object.keys(req.body)>=1){
+			controlh.patchBacklogById(parseInt(req.param('id')),function(error, response){
+				if(error){
+					res.status(500).jsonp({error: error});
+				}else{
+					res.status(200).jsonp(response);
+				}
+			});
+		}else{
+			res.status(500).jsonp({error: "The are not data to update the register"});
+		}
+	}else{
+		res.status(400).jsonp({error : "Malformed URL"});
 	}
 });
 
