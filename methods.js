@@ -297,8 +297,8 @@ router.patch('/projects/:idProject',function(req,res){
 
 /------------------------------------------ Backlog managment : (Post, Get All , Get by id and Patch)  -----------------------------------/ 
 router.post('/projects/:idProject/backlogs/:type', function(req, res){
-	if(req.param('type') == 'history'){
-		res.status(500).jsonp({error : "It can only be a history backlog for project"});
+	if(req.param('type') != 'release' || req.param('type') != 'sprint'){
+		res.status(400).jsonp({error : "Malformed URL"});
 	}else{
 		controlh.addBacklog(req.param('idProject'), req.param('type'), req.body,function(error,response){
 			if(error){
@@ -311,35 +311,71 @@ router.post('/projects/:idProject/backlogs/:type', function(req, res){
 });
 
 router.get('/projects/:idProject/backlogs/:type', function(req, res){
-	if(req.param('idProject') && req.param('type')){
-		controlh.getBacklogsByProjectIdAndType(parseInt(req.param('idProject')),req.param('type'), function(error, response){
+	controlh.getBacklogsByProjectIdAndType(parseInt(req.param('idProject')),req.param('type'), function(error, response){
+		if(error){
+			res.status(500).jsonp({error:error});
+		}else{
+			res.status(200).jsonp(response);
+		}
+	});		
+});
+
+router.get('/projects/:idProject/backlogs/:type/:id', function(req, res){
+	controlh.getBacklogsByProjectIdAndType(parseInt(req.param('idProject')),req.param('type'), function(error, response){
+		if(error){
+			res.status(500).jsonp({error:error});
+		}else{
+			res.status(200).jsonp(response);
+		}
+	});	
+});
+
+router.patch('/projects/:idProject/backlogs/:type/:id', function(req,res){	
+	if(Object.keys(req.body)==1){
+		controlh.patchBacklogById(parseInt(req.param('id')),function(error, response){
 			if(error){
-				res.status(500).jsonp({error:error});
+				res.status(500).jsonp({error: error});
 			}else{
 				res.status(200).jsonp(response);
 			}
-		});		
+		});
 	}else{
+		res.status(500).jsonp({error: "The are not data to update the register"});
+	}
+	
+});
+
+/------------------------------------------ Requirement managment : (Post, Get All , Get by id and Patch)  -----------------------------------/
+
+router.post('/projects/:idProject/backlogs/:type/:idBacklog/requirements', function(req, res){
+
+});
+
+router.get('/projects/:idProject/backlogs/:type/:idBacklog/requirements', function(req, res){
+	if(req.param('type') != 'release' || req.param('type') != 'sprint'){
 		res.status(400).jsonp({error : "Malformed URL"});
+	}else{
+		controlh.getRequirementsByBacklogId(parseInt(req.param('idBacklog')), function(error, response){
+			if(error){
+				res.status(500).jsonp({error: error});
+			}else{
+				res.status(200).jsonp(response);
+			}
+		}); 		
 	}
 });
 
-router.patch('/projects/:idProject/backlogs/:type/:id', function(req,res){
-	if(req.param('idProject') && req.param('type') && req.param('id')){
-		if(Object.keys(req.body)>=1){
-			controlh.patchBacklogById(parseInt(req.param('id')),function(error, response){
-				if(error){
-					res.status(500).jsonp({error: error});
-				}else{
-					res.status(200).jsonp(response);
-				}
-			});
-		}else{
-			res.status(500).jsonp({error: "The are not data to update the register"});
-		}
-	}else{
+router.get('/projects/:idProject/backlogs/:type/:idBacklog/requirements/:id', function(req, res){
+	if(req.param('type') != 'release' || req.param('type') != 'sprint'){
 		res.status(400).jsonp({error : "Malformed URL"});
+	}else{
+		controlh.getRequirementById(parseInt(req.param('id')), function(error, response){
+			if(error){
+				res.status(500).jsonp({error: error});
+			}else{
+				res.status(200).jsonp(response);
+			}
+		}); 		
 	}
 });
-
 module.exports = router;
