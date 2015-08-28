@@ -34,7 +34,7 @@ router.post('/user', function (req, res) {
 		if(err)
 			res.status(500).jsonp({error: err});
 		else
-			res.status(500)(usuario);
+			res.status(500).jsonp(usuario);
 	});
 });
 
