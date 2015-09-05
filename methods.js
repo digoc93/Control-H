@@ -62,8 +62,7 @@ router.post('/login', function (req, res) {
 router.post('/logout', function (req, res) {
 	if(req.body.name && req.body.password && req.body.date){
 		controlh.signOut(req.body.name, req.body.password, new Date(req.body.date), inOffice(req), req.body.labored, function(err,usuario){
-			if(err)
-			{
+			if(err){
 				res.status(500).jsonp({error : err});
 			}
 			else{
