@@ -34,7 +34,7 @@ router.post('/user', function (req, res) {
 		if(err)
 			res.status(500).jsonp({error: err});
 		else
-			res.status(500).jsonp(usuario);
+			res.status(200).jsonp(usuario);
 	});
 });
 
@@ -346,8 +346,14 @@ router.patch('/projects/:idProject/backlogs/:type/:id', function(req,res){
 
 /------------------------------------------ Requirement managment : (Post, Get All , Get by id and Patch)  -----------------------------------/
 
-router.post('/projects/:idProject/backlogs/:type/:idBacklog/requirements', function(req, res){
-
+router.post('/projects/:idProject/backlogs/:type/:idBacklog/requirements', function(req, res){	
+	if(req.param('type') != 'release' || req.param('type') != 'sprint'){
+		res.status(400).jsonp({error : "Malformed URL"});
+	}else{
+		if(Object.keys(req.body).length >= 5){
+			
+		}
+	}
 });
 
 router.get('/projects/:idProject/backlogs/:type/:idBacklog/requirements', function(req, res){
