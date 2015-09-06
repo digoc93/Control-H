@@ -351,7 +351,13 @@ router.post('/projects/:idProject/backlogs/:type/:idBacklog/requirements', funct
 		res.status(400).jsonp({error : "Malformed URL"});
 	}else{
 		if(Object.keys(req.body).length >= 5){
-			
+			controlh.addRequirement(req.body, function(error, response){
+				if(error){
+					res.status(500).jsonp({error : error});
+				}else{
+					res.status(200).jsonp(response);
+				}
+			}); 
 		}
 	}
 });
