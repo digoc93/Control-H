@@ -296,21 +296,27 @@ router.patch('/projects/:idProject',function(req,res){
 
 /------------------------------------------ Backlog managment : (Post, Get All , Get by id and Patch)  -----------------------------------/ 
 router.post('/projects/:idProject/backlogs/:type', function(req, res){
-	if(req.param('type') != 'release' || req.param('type') != 'sprint'){
-		res.status(400).jsonp({error : "Malformed URL"});
-	}else{
-		controlh.addBacklog(req.param('idProject'), req.param('type'), req.body,function(error,response){
-			if(error){
-				res.status(500).jsonp({error:error});
-			}else{
-				res.status(200).jsonp(response);
-			}
-		});
+	if(req.param('type') == 'release' || req.param('type') == 'sprint' || req.param('type') == 'product'){
+		if(Object.keys(req.body).length == 1){
+			controlh.addBacklog(req.param('idProject'), req.param('type'), req.body, function(error, response){
+				if(error){
+					res.status(500).jsonp({error:error});
+				}else{
+					res.status(200).jsonp(response);
+				}
+			});
+		}
+		else{
+			res.status(500).jsonp({error: "The form is incomplete"});
+		}		
+	}
+	else{
+		res.status(400).jsonp({error : "Malformed URL"});		
 	}			
 });
 
 router.get('/projects/:idProject/backlogs/:type', function(req, res){
-	controlh.getBacklogsByProjectIdAndType(parseInt(req.param('idProject')),req.param('type'), function(error, response){
+	controlh.getBacklogs(parseInt(req.param('idProject')),req.param('type'), function(error, response){
 		if(error){
 			res.status(500).jsonp({error:error});
 		}else{
@@ -320,7 +326,7 @@ router.get('/projects/:idProject/backlogs/:type', function(req, res){
 });
 
 router.get('/projects/:idProject/backlogs/:type/:id', function(req, res){
-	controlh.getBacklogsByProjectIdAndType(parseInt(req.param('idProject')),req.param('type'), function(error, response){
+	controlh.getBacklog(parseInt(req.param('id')), parseInt(req.param('idProject')), req.param('type'), function(error, response){
 		if(error){
 			res.status(500).jsonp({error:error});
 		}else{
@@ -330,8 +336,8 @@ router.get('/projects/:idProject/backlogs/:type/:id', function(req, res){
 });
 
 router.patch('/projects/:idProject/backlogs/:type/:id', function(req,res){	
-	if(Object.keys(req.body)==1){
-		controlh.patchBacklogById(parseInt(req.param('id')),function(error, response){
+	if(Object.keys(req.body).length ==1){
+		controlh.patchBacklog(parseInt(req.param('id')), parseInt(req.param('idProject')), req.param('type'), req.body, function(error, response){
 			if(error){
 				res.status(500).jsonp({error: error});
 			}else{
@@ -389,4 +395,6 @@ router.get('/projects/:idProject/backlogs/:type/:idBacklog/requirements/:id', fu
 		}); 		
 	}
 });
+
+
 module.exports = router;
