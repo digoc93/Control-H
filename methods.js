@@ -345,7 +345,7 @@ router.patch('/projects/:idProject/backlogs/:type/:id', function(req,res){
 			}
 		});
 	}else{
-		res.status(500).jsonp({error: "The are not data to update the register"});
+		res.status(500).jsonp({error: "There are not enough data to update the register"});
 	}
 	
 });
@@ -353,48 +353,67 @@ router.patch('/projects/:idProject/backlogs/:type/:id', function(req,res){
 /------------------------------------------ Requirement managment : (Post, Get All , Get by id and Patch)  -----------------------------------/
 
 router.post('/projects/:idProject/backlogs/:type/:idBacklog/requirements', function(req, res){	
-	if(req.param('type') != 'release' || req.param('type') != 'sprint'){
-		res.status(400).jsonp({error : "Malformed URL"});
-	}else{
+	if(req.param('type') == 'release' || req.param('type') == 'sprint'){
 		if(Object.keys(req.body).length >= 5){
-			controlh.addRequirement(req.body, function(error, response){
+			controlh.addRequirement(parseInt(req.param('idProject')), req.param('type'), parseInt(req.param('idBacklog')), req.body, function(error, response){
 				if(error){
 					res.status(500).jsonp({error : error});
 				}else{
 					res.status(200).jsonp(response);
 				}
 			}); 
-		}
+		}else{
+			res.status(500).jsonp({error: "The form is incomplete"});
+		}			
+	}else{
+		res.status(400).jsonp({error : "Malformed URL"});
 	}
 });
 
 router.get('/projects/:idProject/backlogs/:type/:idBacklog/requirements', function(req, res){
-	if(req.param('type') != 'release' || req.param('type') != 'sprint'){
-		res.status(400).jsonp({error : "Malformed URL"});
-	}else{
-		controlh.getRequirementsByBacklogId(parseInt(req.param('idBacklog')), function(error, response){
+	if(req.param('type') == 'release' || req.param('type') == 'sprint'){
+		controlh.getRequirements(parseInt(req.param('idProject')), req.param('type'), parseInt(req.param('idBacklog')), function(error, response){
 			if(error){
 				res.status(500).jsonp({error: error});
 			}else{
 				res.status(200).jsonp(response);
 			}
-		}); 		
+		});		
+	}else{
+		res.status(400).jsonp({error : "Malformed URL"}); 		
 	}
 });
 
 router.get('/projects/:idProject/backlogs/:type/:idBacklog/requirements/:id', function(req, res){
-	if(req.param('type') != 'release' || req.param('type') != 'sprint'){
-		res.status(400).jsonp({error : "Malformed URL"});
-	}else{
-		controlh.getRequirementById(parseInt(req.param('id')), function(error, response){
+	if(req.param('type') == 'release' || req.param('type') == 'sprint'){
+		controlh.getRequirement(parseInt(req.param('id')),parseInt(req.param('idProject')), req.param('type'), parseInt(req.param('idBacklog')), function(error, response){
 			if(error){
 				res.status(500).jsonp({error: error});
 			}else{
 				res.status(200).jsonp(response);
 			}
 		}); 		
+	}else{
+		res.status(400).jsonp({error : "Malformed URL"});		
 	}
 });
 
+router.patch('/projects/:idProject/backlogs/:type/:idBacklog/requirements/:id', function(req, res){
+	if(req.param('type') == 'release' || req.param('type') == 'sprint'){
+		if(Object.keys(req.body).length > 0){
+			controlh.patchRequirement(parseInt(req.param('id')), parseInt(req.param('idProject')), req.param('type'), parseInt(req.param('idBacklog')), req.body, function(error, response){
+				if(error){					
+					res.status(500).jsonp({error : error});
+				}else{
+					res.status(200).jsonp(response);
+				}
+			}); 
+		}else{
+			res.status(500).jsonp({error: "There are not enough data to update the register"});
+		}			
+	}else{
+		res.status(400).jsonp({error : "Malformed URL"});
+	}
+});
 
 module.exports = router;
