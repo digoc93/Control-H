@@ -416,4 +416,55 @@ router.patch('/projects/:idProject/backlogs/:type/:idBacklog/requirements/:id', 
 	}
 });
 
+/------------------------------------------ History managment : (Post, Get All , Get by id and Patch)  -----------------------------------/
+
+router.post('/projects/:idProject/backlogs/product/:idBacklog/histories', function(req, res){	
+	if(Object.keys(req.body).length >= 5){
+		controlh.addHistory(parseInt(req.param('idProject')), parseInt(req.param('idBacklog')), req.body, function(error, response){
+			if(error){
+				res.status(500).jsonp({error : error});
+			}else{
+				res.status(200).jsonp(response);
+			}
+		}); 
+	}else{
+		res.status(500).jsonp({error: "The form is incomplete"});
+	}			
+});
+
+router.get('/projects/:idProject/backlogs/product/:idBacklog/histories', function(req, res){
+	controlh.getHistories(parseInt(req.param('idProject')), parseInt(req.param('idBacklog')), function(error, response){
+		if(error){
+			res.status(500).jsonp({error: error});
+		}else{
+			res.status(200).jsonp(response);
+		}
+	});			
+});
+
+router.get('/projects/:idProject/backlogs/product/:idBacklog/histories/:id', function(req, res){
+	controlh.getHistory(parseInt(req.param('id')), parseInt(req.param('idProject')), parseInt(req.param('idBacklog')), function(error, response){
+		if(error){
+			res.status(500).jsonp({error: error});
+		}else{
+			res.status(200).jsonp(response);
+		}
+	}); 		
+});
+
+router.patch('/projects/:idProject/backlogs/product/:idBacklog/histories/:id', function(req, res){
+	if(Object.keys(req.body).length > 0){
+		controlh.patchHistory(parseInt(req.param('id')), parseInt(req.param('idProject')), parseInt(req.param('idBacklog')), req.body, function(error, response){
+			if(error){					
+				res.status(500).jsonp({error : error});
+			}else{
+				res.status(200).jsonp(response);
+			}
+		}); 
+	}else{
+		res.status(500).jsonp({error: "There are not enough data to update the register"});
+	}		
+});
+
+
 module.exports = router;
