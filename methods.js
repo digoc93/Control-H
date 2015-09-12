@@ -466,5 +466,37 @@ router.patch('/projects/:idProject/backlogs/product/:idBacklog/histories/:id', f
 	}		
 });
 
+router.post('/test',function(req, res){
+	res.status(200).jsonp(validateCreateRequestIntegrity(req.body.solicitud, req.body.modelo));
+});
+
+var validateCreateRequestIntegrity = function(req, structure){
+	var requiredNotPresent= [];
+	var requiredFields= 0;
+	for(field in structure){
+		if(structure[field].required == true){
+			requiredFields++;
+		}
+		if(req[field] == undefined){
+			if(structure[field].required == true){
+				requiredNotPresent.push(field);
+			}
+		}
+	}
+	if(requiredNotPresent.length >0){
+		if(Object.keys(req).length < requiredFields){
+			var str ="";
+			for(field in requiredNotPresent){
+				str += requiredNotPresent[field] + ", ";
+			}
+			return ({error : true, message: "The form in incomplete, missing fields: "+ str});
+		}
+		return ({error: true, message: "There are required fields that are not present"});
+	}else if(Object.keys(req).length > requiredFields){
+		return ({error : true, message: "There are extra fields"});
+	}else{
+		return ({error : false, message: "It's Ok"});
+	}
+}
 
 module.exports = router;
