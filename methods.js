@@ -3,6 +3,12 @@ var express = require('express');
 var router = express.Router();
 var ipOffice = require("./config/config.json").ipOffice;
 var differenceUTM = require("./config/config.json").differenceUTM;
+var dataModelBacklog = require("./node_modules/ControlH3/lib/models/entities/backlogStructure.js").data;
+var dataModelHistory = require("./node_modules/ControlH3/lib/models/entities/historyStructure.js").data;
+var dataModelRequirement = require("./node_modules/ControlH3/lib/models/entities/requirementStructure.js").data;
+var dataModelSchedule = require("./node_modules/ControlH3/lib/models/entities/scheduleStructure.js").data;
+var dataModelUser = require("./node_modules/ControlH3/lib/models/entities/userStructure.js").data;
+var dataModelWorkSpace = require("./node_modules/ControlH3/lib/models/entities/workSpaceStructure.js").data;
 
 router.get('/test1', function (req, res, next) {
  	var hora;
@@ -24,22 +30,31 @@ router.get('/test1', function (req, res, next) {
 
 /----------------------------------------------------- User managment and basic services  ------------------------------------------------/ 
 
-router.post('/user', function (req, res) {
-	var user = {
-		name : req.body.name,
-		password :req.body.password
-	};
+router.post('/users', function (req, res) {
+	var dataModelUserC = JSON.parse(JSON.stringify(dataModelUser));
+	var validation = validateRequestIntegrity(req.body, dataModelUserC, false);
+	if(validation.error == false){
+		var user = {
+			name : req.body.name,
+			password :req.body.password
+		};
 
-	controlh.signUp(user, function(err, usuario){
-		if(err)
-			res.status(500).jsonp({error: err});
-		else
-			res.status(200).jsonp(usuario);
-	});
+		controlh.signUp(user, function(err, usuario){
+			if(err)
+				res.status(500).jsonp({error: err});
+			else
+				res.status(200).jsonp(usuario);
+		});
+	}else{
+		res.status(500).jsonp({error: validation.message});
+	}
 });
 
 router.post('/login', function (req, res) {
-	if(req.body.name && req.body.password && req.body.date){
+	var dataModelUserC = JSON.parse(JSON.stringify(dataModelUser));
+	dataModelUserC.date = {type: Date, mandatoryCH3 : true};
+	var validation = validateRequestIntegrity(req.body, dataModelUserC, false);
+	if(validation.error == false){
 		controlh.signIn(req.body.name, req.body.password, new Date(req.body.date), inOffice(req), function(err,usuario){
 			if(err){
 				res.status(500).jsonp({error : err});
@@ -55,12 +70,16 @@ router.post('/login', function (req, res) {
 		});
 	}
 	else{
-		res.status(500).jsonp({error: "Enter username and password"});
+		res.status(500).jsonp({error: validation.message});
 	}
 });
 
 router.post('/logout', function (req, res) {
-	if(req.body.name && req.body.password && req.body.date){
+	var dataModelUserC = JSON.parse(JSON.stringify(dataModelUser));
+	dataModelUserC.date = {type: Date, mandatoryCH3 : true};
+	dataModelUserC.labored = {type: String, mandatoryCH3 : true};
+	var validation = validateRequestIntegrity(req.body, dataModelUserC, false);
+	if(validation.error == false){
 		controlh.signOut(req.body.name, req.body.password, new Date(req.body.date), inOffice(req), req.body.labored, function(err,usuario){
 			if(err){
 				res.status(500).jsonp({error : err});
@@ -74,6 +93,9 @@ router.post('/logout', function (req, res) {
 				res.status(200).jsonp(user);
 			}
 		});
+	}
+	else{
+		res.status(500).jsonp({error: validation.message});
 	}
 });
 
@@ -96,7 +118,10 @@ router.get('/workingNow',function (req, res) {
 });
 
 router.post('/passwordChange',function(req,res){
-	if(req.body.name && req.body.password && req.body.newPassword){
+	var dataModelUserC = JSON.parse(JSON.stringify(dataModelUser));
+	dataModelUserC.newPassword = {type: String, mandatoryCH3 : true};
+	var validation = validateRequestIntegrity(req.body, dataModelUserC, false);
+	if(validation.error == false){
 		var user = {
 			name : req.body.name,
 			password:req.body.password,
@@ -110,7 +135,7 @@ router.post('/passwordChange',function(req,res){
 			}
 		});
 	}else{
-		res.status(500).jsonp({error: "The data are not complete"});
+		res.status(500).jsonp({error: validation.message});
 	}
 });
 
@@ -271,13 +296,17 @@ router.get('/projects', function(req,res){
 });
 
 router.get('/projects/:idProject', function(req,res){
-	controlh.getProjectById(parseInt(req.param("idProject")),function(err,response){
-		if(err){
-			res.status(500).jsonp({error:err});
-		}else{
-			res.status(200).jsonp(response);
-		}
-	});
+	if(req.param('idProject')){
+		controlh.getProjectById(parseInt(req.param("idProject")),function(err,response){
+			if(err){
+				res.status(500).jsonp({error:err});
+			}else{
+				res.status(200).jsonp(response);
+			}
+		});
+	}else{
+		res.status(400).jsonp({error : "Malformed URL"});
+	}
 });
 
 router.patch('/projects/:idProject',function(req,res){
@@ -467,26 +496,26 @@ router.patch('/projects/:idProject/backlogs/product/:idBacklog/histories/:id', f
 });
 
 router.post('/testCreate',function(req, res){
-	res.status(200).jsonp(validateCreateRequestIntegrity(req.body.solicitud, req.body.modelo, false));
+	res.status(200).jsonp(validateRequestIntegrity(req.body.solicitud, req.body.modelo, false));
 });
 
 router.post('/testEdit',function(req, res){
-	res.status(200).jsonp(validateCreateRequestIntegrity(req.body.solicitud, req.body.modelo, true));
+	res.status(200).jsonp(validateRequestIntegrity(req.body.solicitud, req.body.modelo, true));
 });
 
-var validateCreateRequestIntegrity = function(req, structure, editing){
+var validateRequestIntegrity = function(req, structure, editing){
 	var requiredNotPresent= [];
 	var requiredFields= 0;
 	var valid = 0;
 	if(Object.keys(req).length == 0){
-		return ({error: true, message: "The form is incomplete"});
+		return ({error: true, message: "The form is empty"});
 	}
 	for(field in structure){
-		if(structure[field].required == true){
+		if(structure[field].mandatoryCH3 == true){
 			requiredFields++;
-		}
+		}		
 		if(req[field] == undefined || req[field].length == 0){
-			if(structure[field].required == true){
+			if(structure[field].mandatoryCH3 == true){				
 				requiredNotPresent.push(field);
 			}
 		}else{
@@ -495,10 +524,10 @@ var validateCreateRequestIntegrity = function(req, structure, editing){
 	}	
 	if(editing){
 		if(valid == 0){			
-			return ({error: true, message: "No field will modify the register"});			
+			return ({error: true, message: "Any field will modify the register"});			
 		}else{
 			return ({error: false, message: "It's ok"});
-		}return ({error: false, message: "It's ok"});
+		}
 	}else{
 		if(requiredNotPresent.length >0){
 			var str ="";
