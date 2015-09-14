@@ -466,37 +466,53 @@ router.patch('/projects/:idProject/backlogs/product/:idBacklog/histories/:id', f
 	}		
 });
 
-router.post('/test',function(req, res){
-	res.status(200).jsonp(validateCreateRequestIntegrity(req.body.solicitud, req.body.modelo));
+router.post('/testCreate',function(req, res){
+	res.status(200).jsonp(validateCreateRequestIntegrity(req.body.solicitud, req.body.modelo, false));
 });
 
-var validateCreateRequestIntegrity = function(req, structure){
+router.post('/testEdit',function(req, res){
+	res.status(200).jsonp(validateCreateRequestIntegrity(req.body.solicitud, req.body.modelo, true));
+});
+
+var validateCreateRequestIntegrity = function(req, structure, editing){
 	var requiredNotPresent= [];
 	var requiredFields= 0;
+	var valid = 0;
+	if(Object.keys(req).length == 0){
+		return ({error: true, message: "The form is incomplete"});
+	}
 	for(field in structure){
 		if(structure[field].required == true){
 			requiredFields++;
 		}
-		if(req[field] == undefined){
+		if(req[field] == undefined || req[field].length == 0){
 			if(structure[field].required == true){
 				requiredNotPresent.push(field);
 			}
+		}else{
+			valid++;
 		}
-	}
-	if(requiredNotPresent.length >0){
-		if(Object.keys(req).length < requiredFields){
+	}	
+	if(editing){
+		if(valid == 0){			
+			return ({error: true, message: "No field will modify the register"});			
+		}else{
+			return ({error: false, message: "It's ok"});
+		}return ({error: false, message: "It's ok"});
+	}else{
+		if(requiredNotPresent.length >0){
 			var str ="";
 			for(field in requiredNotPresent){
 				str += requiredNotPresent[field] + ", ";
 			}
-			return ({error : true, message: "The form in incomplete, missing fields: "+ str});
+			return ({error : true, message: "The form is incomplete, missing or empty fields: "+ str});		
+		}else if(Object.keys(req).length > requiredFields){
+			return ({error : true, message: "There are extra fields"});
+		}else{
+			return ({error : false, message: "It's ok"});
 		}
-		return ({error: true, message: "There are required fields that are not present"});
-	}else if(Object.keys(req).length > requiredFields){
-		return ({error : true, message: "There are extra fields"});
-	}else{
-		return ({error : false, message: "It's Ok"});
 	}
+	
 }
 
 module.exports = router;
