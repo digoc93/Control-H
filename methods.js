@@ -9,6 +9,7 @@ var dataModelRequirement = require("./node_modules/ControlH3/lib/models/entities
 var dataModelSchedule = require("./node_modules/ControlH3/lib/models/entities/scheduleStructure.js").data;
 var dataModelUser = require("./node_modules/ControlH3/lib/models/entities/userStructure.js").data;
 var dataModelWorkSpace = require("./node_modules/ControlH3/lib/models/entities/workSpaceStructure.js").data;
+var dataModelProject = require("./node_modules/ControlH3/lib/models/entities/projectStructure.js").data;
 
 router.get('/test1', function (req, res, next) {
  	var hora;
@@ -31,9 +32,8 @@ router.get('/test1', function (req, res, next) {
 /----------------------------------------------------- User managment and basic services  ------------------------------------------------/ 
 
 router.post('/users', function (req, res) {
-	var dataModelUserC = JSON.parse(JSON.stringify(dataModelUser));
-	var validation = validateRequestIntegrity(req.body, dataModelUserC, false);
-	if(validation.error == false){
+	var validation = validateRequestIntegrity(req.body, dataModelUser, false);
+	if(!validation.error){
 		var user = {
 			name : req.body.name,
 			password :req.body.password
@@ -54,7 +54,7 @@ router.post('/login', function (req, res) {
 	var dataModelUserC = JSON.parse(JSON.stringify(dataModelUser));
 	dataModelUserC.date = {type: Date, mandatoryCH3 : true};
 	var validation = validateRequestIntegrity(req.body, dataModelUserC, false);
-	if(validation.error == false){
+	if(!validation.error){
 		controlh.signIn(req.body.name, req.body.password, new Date(req.body.date), inOffice(req), function(err,usuario){
 			if(err){
 				res.status(500).jsonp({error : err});
@@ -79,7 +79,7 @@ router.post('/logout', function (req, res) {
 	dataModelUserC.date = {type: Date, mandatoryCH3 : true};
 	dataModelUserC.labored = {type: String, mandatoryCH3 : true};
 	var validation = validateRequestIntegrity(req.body, dataModelUserC, false);
-	if(validation.error == false){
+	if(!validation.error){
 		controlh.signOut(req.body.name, req.body.password, new Date(req.body.date), inOffice(req), req.body.labored, function(err,usuario){
 			if(err){
 				res.status(500).jsonp({error : err});
@@ -121,7 +121,7 @@ router.post('/passwordChange',function(req,res){
 	var dataModelUserC = JSON.parse(JSON.stringify(dataModelUser));
 	dataModelUserC.newPassword = {type: String, mandatoryCH3 : true};
 	var validation = validateRequestIntegrity(req.body, dataModelUserC, false);
-	if(validation.error == false){
+	if(!validation.error){
 		var user = {
 			name : req.body.name,
 			password:req.body.password,
@@ -142,7 +142,8 @@ router.post('/passwordChange',function(req,res){
 /--------------------------------------- Schedule managment : (Post, Get by user, Get All, and Patch)  -----------------------------------/ 
 
 router.post('/schedules',function(req,res){
-	if(Object.keys(req.body).length==2){		
+	var validation = validateRequestIntegrity(req.body, dataModelSchedule, false);
+	if(!validation.error){		
 		var agendaSubmit={
 			idUser: req.body.idUser,
 			day: req.body.day
@@ -155,7 +156,7 @@ router.post('/schedules',function(req,res){
 			}	
 		});
 	}else{
-		res.status(500).jsonp({error: "The form is incomplete"});
+		res.status(500).jsonp({error: validation.message});
 	}
 });
 
@@ -181,7 +182,8 @@ router.get('/schedules',function(req,res){
 });
 
 router.patch('/schedules/:idSchedule',function(req,res){
-	if(Object.keys(req.body).length>0){
+	var validation = validateRequestIntegrity(req.body, dataModelSchedule, true);
+	if(!validation.error){
 		controlh.patchScheduleById(parseInt(req.param("idSchedule")), req.body.day, function(error,response){
 			if(error){
 				res.status(500).jsonp({error:error});
@@ -190,7 +192,7 @@ router.patch('/schedules/:idSchedule',function(req,res){
 			}
 		});
 	}else{
-		res.status(500).jsonp({error: "The are not data to update the register"});
+		res.status(500).jsonp({error: validation.message});
 	}
 });
 
@@ -272,7 +274,8 @@ router.get('/rango/:idUser/:fechaInicial/:fechaFinal', function (req, res) {
 /------------------------------------------ Project managment : (Post, Get All , Get by id and Patch)  -----------------------------------/ 
 
 router.post('/projects', function(req, res){
-	if(Object.keys(req.body).length == 5){
+	var validation = validateRequestIntegrity(req.body, dataModelProject, false);
+	if(!validation.error){
 		controlh.addProject(req.body,function(error,response){
 			if(error){
 				res.status(500).jsonp({error:error});
@@ -281,7 +284,7 @@ router.post('/projects', function(req, res){
 			}
 		});	
 	}else{
-		res.status(500).jsonp({error: "The form is incomplete"});
+		res.status(500).jsonp({error: validation.message});
 	}	
 });
 
@@ -296,37 +299,35 @@ router.get('/projects', function(req,res){
 });
 
 router.get('/projects/:idProject', function(req,res){
-	if(req.param('idProject')){
-		controlh.getProjectById(parseInt(req.param("idProject")),function(err,response){
-			if(err){
-				res.status(500).jsonp({error:err});
-			}else{
-				res.status(200).jsonp(response);
-			}
-		});
-	}else{
-		res.status(400).jsonp({error : "Malformed URL"});
-	}
+	controlh.getProjectById(parseInt(req.param("idProject")), function(err,response){
+		if(err){
+			res.status(500).jsonp({error:err});
+		}else{
+			res.status(200).jsonp(response);
+		}
+	});
 });
 
 router.patch('/projects/:idProject',function(req,res){
-	if(Object.keys(req.body).length>0){
+	var validation = validateRequestIntegrity(req.body, dataModelSchedule, true);
+	if(!validation.error){
 		controlh.patchProjectById(parseInt(req.param("idProject")),req.body, function(error,response){
 			if(error){
 				res.status(500).jsonp({error:error});
 			}else{
 				res.status(200).jsonp(response);
 			}
-	});
+		});
 	}else{
-		res.status(500).jsonp({error: "The are not data to update the register"});
+		res.status(500).jsonp({error: validation.message});
 	}
 });
 
 /------------------------------------------ Backlog managment : (Post, Get All , Get by id and Patch)  -----------------------------------/ 
 router.post('/projects/:idProject/backlogs/:type', function(req, res){
 	if(req.param('type') == 'release' || req.param('type') == 'sprint' || req.param('type') == 'product'){
-		if(Object.keys(req.body).length == 1){
+		var validation = validateRequestIntegrity(req.body, dataModelBacklog, false);
+		if(!validation.error){
 			controlh.addBacklog(req.param('idProject'), req.param('type'), req.body, function(error, response){
 				if(error){
 					res.status(500).jsonp({error:error});
@@ -336,7 +337,7 @@ router.post('/projects/:idProject/backlogs/:type', function(req, res){
 			});
 		}
 		else{
-			res.status(500).jsonp({error: "The form is incomplete"});
+			res.status(500).jsonp({error: validation.message});
 		}		
 	}
 	else{
@@ -365,7 +366,8 @@ router.get('/projects/:idProject/backlogs/:type/:id', function(req, res){
 });
 
 router.patch('/projects/:idProject/backlogs/:type/:id', function(req,res){	
-	if(Object.keys(req.body).length ==1){
+	var validation = validateRequestIntegrity(req.body, dataModelBacklog, true);
+	if(!validation.error){
 		controlh.patchBacklog(parseInt(req.param('id')), parseInt(req.param('idProject')), req.param('type'), req.body, function(error, response){
 			if(error){
 				res.status(500).jsonp({error: error});
@@ -374,7 +376,7 @@ router.patch('/projects/:idProject/backlogs/:type/:id', function(req,res){
 			}
 		});
 	}else{
-		res.status(500).jsonp({error: "There are not enough data to update the register"});
+		res.status(500).jsonp({error: validation.message});
 	}
 	
 });
@@ -383,7 +385,8 @@ router.patch('/projects/:idProject/backlogs/:type/:id', function(req,res){
 
 router.post('/projects/:idProject/backlogs/:type/:idBacklog/requirements', function(req, res){	
 	if(req.param('type') == 'release' || req.param('type') == 'sprint'){
-		if(Object.keys(req.body).length >= 5){
+		var validation = validateRequestIntegrity(req.body, dataModelRequirement, false);
+		if(!validation.error){
 			controlh.addRequirement(parseInt(req.param('idProject')), req.param('type'), parseInt(req.param('idBacklog')), req.body, function(error, response){
 				if(error){
 					res.status(500).jsonp({error : error});
@@ -392,7 +395,7 @@ router.post('/projects/:idProject/backlogs/:type/:idBacklog/requirements', funct
 				}
 			}); 
 		}else{
-			res.status(500).jsonp({error: "The form is incomplete"});
+			res.status(500).jsonp({error: validation.message});
 		}			
 	}else{
 		res.status(400).jsonp({error : "Malformed URL"});
@@ -429,7 +432,8 @@ router.get('/projects/:idProject/backlogs/:type/:idBacklog/requirements/:id', fu
 
 router.patch('/projects/:idProject/backlogs/:type/:idBacklog/requirements/:id', function(req, res){
 	if(req.param('type') == 'release' || req.param('type') == 'sprint'){
-		if(Object.keys(req.body).length > 0){
+		var validation = validateRequestIntegrity(req.body, dataModelRequirement, true);
+		if(!validation.error){
 			controlh.patchRequirement(parseInt(req.param('id')), parseInt(req.param('idProject')), req.param('type'), parseInt(req.param('idBacklog')), req.body, function(error, response){
 				if(error){					
 					res.status(500).jsonp({error : error});
@@ -438,7 +442,7 @@ router.patch('/projects/:idProject/backlogs/:type/:idBacklog/requirements/:id', 
 				}
 			}); 
 		}else{
-			res.status(500).jsonp({error: "There are not enough data to update the register"});
+			res.status(500).jsonp({error: validation.message});
 		}			
 	}else{
 		res.status(400).jsonp({error : "Malformed URL"});
@@ -447,8 +451,9 @@ router.patch('/projects/:idProject/backlogs/:type/:idBacklog/requirements/:id', 
 
 /------------------------------------------ History managment : (Post, Get All , Get by id and Patch)  -----------------------------------/
 
-router.post('/projects/:idProject/backlogs/product/:idBacklog/histories', function(req, res){	
-	if(Object.keys(req.body).length >= 5){
+router.post('/projects/:idProject/backlogs/product/:idBacklog/histories', function(req, res){
+	var validation = validateRequestIntegrity(req.body, dataModelHistory, false);	
+	if(!validation.error){
 		controlh.addHistory(parseInt(req.param('idProject')), parseInt(req.param('idBacklog')), req.body, function(error, response){
 			if(error){
 				res.status(500).jsonp({error : error});
@@ -457,7 +462,7 @@ router.post('/projects/:idProject/backlogs/product/:idBacklog/histories', functi
 			}
 		}); 
 	}else{
-		res.status(500).jsonp({error: "The form is incomplete"});
+		res.status(500).jsonp({error: validation.message});
 	}			
 });
 
@@ -482,7 +487,8 @@ router.get('/projects/:idProject/backlogs/product/:idBacklog/histories/:id', fun
 });
 
 router.patch('/projects/:idProject/backlogs/product/:idBacklog/histories/:id', function(req, res){
-	if(Object.keys(req.body).length > 0){
+	var validation = validateRequestIntegrity(req.body, dataModelHistory, true);
+	if(!validation.error){
 		controlh.patchHistory(parseInt(req.param('id')), parseInt(req.param('idProject')), parseInt(req.param('idBacklog')), req.body, function(error, response){
 			if(error){					
 				res.status(500).jsonp({error : error});
@@ -491,7 +497,7 @@ router.patch('/projects/:idProject/backlogs/product/:idBacklog/histories/:id', f
 			}
 		}); 
 	}else{
-		res.status(500).jsonp({error: "There are not enough data to update the register"});
+		res.status(500).jsonp({error: validation.message});
 	}		
 });
 
@@ -511,9 +517,7 @@ var validateRequestIntegrity = function(req, structure, editing){
 		return ({error: true, message: "The form is empty"});
 	}
 	for(field in structure){
-		if(structure[field].mandatoryCH3 == true){
-			requiredFields++;
-		}		
+		requiredFields++;		
 		if(req[field] == undefined || req[field].length == 0){
 			if(structure[field].mandatoryCH3 == true){				
 				requiredNotPresent.push(field);
@@ -534,6 +538,8 @@ var validateRequestIntegrity = function(req, structure, editing){
 			for(field in requiredNotPresent){
 				str += requiredNotPresent[field] + ", ";
 			}
+			if(str.length>0);
+			str = str.substring(0, str.length-2)+".";
 			return ({error : true, message: "The form is incomplete, missing or empty fields: "+ str});		
 		}else if(Object.keys(req).length > requiredFields){
 			return ({error : true, message: "There are extra fields"});
